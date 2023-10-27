@@ -53,7 +53,7 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
-            _titleWidget("段数：4，有气泡，有单位，有节点文字"),
+            _titleWidget("1、段数：4，有气泡，有单位，有节点文字"),
             ZFJNodeSlisder(
               key: _slisderStateKey_0,
               width: kZFJScreenUtil.screenWidth - 32,
@@ -67,7 +67,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 print("----------> value = $value");
               },
             ),
-            _titleWidget("段数：1，有气泡，有单位，有节点文字"),
+            _titleWidget("2、段数：1，有气泡，有单位，有节点文字"),
             ZFJNodeSlisder(
               key: _slisderStateKey_1,
               width: kZFJScreenUtil.screenWidth - 32,
@@ -82,7 +82,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 print("----------> value = $value");
               },
             ),
-            _titleWidget("段数：3，有气泡，没单位，有节点文字"),
+            _titleWidget("3、段数：3，有气泡，没单位，有节点文字"),
             ZFJNodeSlisder(
               key: _slisderStateKey_2,
               width: kZFJScreenUtil.screenWidth - 32,
@@ -97,15 +97,15 @@ class _MyHomePageState extends State<MyHomePage> {
                 print("----------> value = $value");
               },
             ),
-            _titleWidget("段数：3，有气泡，没节点文字"),
+            _titleWidget("4、段数：4，有气泡，没单位，没节点文字"),
             ZFJNodeSlisder(
               key: _slisderStateKey_3,
               width: kZFJScreenUtil.screenWidth - 32,
               maxValue: 100,
-              value: 0.2,
+              value: 0.1,
               unitText: "%",
-              divisions: 3,
-              activeTrackColor: Colors.green,
+              divisions: 4,
+              activeTrackColor: Colors.yellow,
               isShowNodeText: false,
               isEnabled: true,
               isShowBubble: true,

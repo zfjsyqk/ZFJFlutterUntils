@@ -20,7 +20,7 @@ class ZFJNodeSlisder extends StatefulWidget {
   final double nodeWidth;
   /// 滑动跳到节点
   final bool toNodeBool;
-  /// 回调
+  /// 滑竿回调
   final Function(int) valueChanged;
   /// 指定初始化的值 0-1
   final double value;
