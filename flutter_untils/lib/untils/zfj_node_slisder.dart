@@ -28,14 +28,20 @@ class ZFJNodeSlisder extends StatefulWidget {
   final bool isEnabled;
   /// 是否显示气泡
   final bool isShowBubble;
-  /// 气泡单位
-  final String bubbleUnit;
+  /// 气泡和节点单位
+  final String unitText;
+  /// 是否显示节点文字
+  final bool isShowNodeText;
   /// 选中颜色
   final Color? activeTrackColor;
   /// 未选中颜色
   final Color? unActiveTrackColor;
+  /// 节点背景颜色
+  final Color? nodeBgColor;
+  /// 气泡字体样式
+  final TextStyle? bubbleValueStyle;
   /// 节点字体样式
-  final TextStyle? valueStyle;
+  final TextStyle? nodeValueStyle;
 
   ZFJNodeSlisder({
     super.key,
@@ -51,10 +57,13 @@ class ZFJNodeSlisder extends StatefulWidget {
     this.value = 0,
     this.isEnabled = true,
     this.isShowBubble = false,
-    this.bubbleUnit = "",
+    this.unitText = "",
+    this.isShowNodeText = true,
     this.activeTrackColor,
     this.unActiveTrackColor,
-    this.valueStyle,
+    this.nodeBgColor,
+    this.bubbleValueStyle,
+    this.nodeValueStyle,
   });
 
   ///
@@ -106,6 +115,7 @@ class ZFJNodeSlisderState extends State<ZFJNodeSlisder> {
       child: SizedBox(
         height: 16 + 20 + 20,
         width: widget.width,
+        // color: widget.bgColor ?? Colors.white,
         child: Stack(
           alignment: Alignment.center,
           children: [
@@ -126,10 +136,11 @@ class ZFJNodeSlisderState extends State<ZFJNodeSlisder> {
                       borderRadius: const BorderRadius.all(Radius.circular(3),),
                     ),
                     child: Text(
-                      (int.parse((widget.maxValue! * value).toStringAsFixed(0)) <= widget.minValue!) ? '${widget.minValue}${widget.bubbleUnit}' : '${(widget.maxValue! * value).toStringAsFixed(0)}${widget.bubbleUnit}',
-                      style: widget.valueStyle ?? TextStyle(
+                      (int.parse((widget.maxValue! * value).toStringAsFixed(0)) <= widget.minValue!) ?
+                      '${widget.minValue}${widget.unitText}' : '${(widget.maxValue! * value).toStringAsFixed(0)}${widget.unitText}',
+                      style: widget.bubbleValueStyle ?? const TextStyle(
                         fontSize: 9,
-                        color: hexToColor("#EBEBEB"),
+                        color: Colors.white,
                         fontWeight: FontWeight.w400,
                       ),
                       textAlign: TextAlign.center,
@@ -139,18 +150,16 @@ class ZFJNodeSlisderState extends State<ZFJNodeSlisder> {
                   Container(
                     width: bubbleTipsWidth,
                     height: 3,
-                    alignment: Alignment.center,
                     margin: EdgeInsets.only(left: left),
-                    decoration: const BoxDecoration(
-                      image: DecorationImage(
-                        image: AssetImage('assets/images/slisder_bubble_tips.png'),
-                        fit: BoxFit.fill,
+                    child: CustomPaint(
+                      painter: ZFJDownArrowPainter(
+                          bgColor: widget.activeTrackColor ?? hexToColor("#EBEBEB")
                       ),
                     ),
-                  ),
+                  )
                 ],
               ),
-            ) : Container(),
+            ) : const SizedBox(),
 
             // slider
             Container(
@@ -160,12 +169,13 @@ class ZFJNodeSlisderState extends State<ZFJNodeSlisder> {
                 color: widget.unActiveTrackColor ?? hexToColor("#EBEBEB"),
               ),
               child: CustomPaint(
-                painter: SliderPainter((double maxDx) {
-                  maxX = maxDx;
-                  return value * maxDx;
-                },
+                painter: ZFJSliderPainter (
                     activeTrackColor: widget.activeTrackColor ?? hexToColor("#FFBE3F"),
-                    divisions: widget.divisions
+                    divisions: widget.divisions,
+                    getDx: (double maxDx) {
+                      maxX = maxDx;
+                      return value * maxDx;
+                    }
                 ),
               ),
             ),
@@ -181,9 +191,9 @@ class ZFJNodeSlisderState extends State<ZFJNodeSlisder> {
                       maxWidth: widget.width
                   ),
                   child: Wrap(
-                    /// 横向间距
+                    // 横向间距
                     spacing: spacing,
-                    /// 纵向间距
+                    // 纵向间距
                     runSpacing: double.infinity,
                     alignment: WrapAlignment.start,
                     crossAxisAlignment: WrapCrossAlignment.start,
@@ -196,6 +206,7 @@ class ZFJNodeSlisderState extends State<ZFJNodeSlisder> {
                           width: widget.nodeWidth,
                           height: widget.nodeWidth,
                           decoration: BoxDecoration(
+                            color: widget.nodeBgColor ?? Colors.white,
                             border: Border.all(
                               color: currentValue >= nodeValue ? (widget.activeTrackColor ?? hexToColor("#FFBE3F")) : (widget.unActiveTrackColor ?? hexToColor("#EBEBEB")),
                               width: 2,
@@ -220,6 +231,7 @@ class ZFJNodeSlisderState extends State<ZFJNodeSlisder> {
                     height: widget.sliderWidth,
                     margin: const EdgeInsets.only(top: 0, bottom: 0),
                     decoration: BoxDecoration(
+                      color: widget.nodeBgColor ?? Colors.white,
                       border: Border.all(
                         color: widget.activeTrackColor ?? hexToColor("#FFBE3F"),
                         width: 2,
@@ -230,6 +242,28 @@ class ZFJNodeSlisderState extends State<ZFJNodeSlisder> {
                   )
               ),
             ),
+
+            // 节点文本
+            widget.isShowNodeText ? Positioned(
+                bottom: 3,
+                child: SizedBox(
+                  width: widget.width,
+                  height: widget.height + 10,
+                  child: CustomPaint(
+                    painter: ZFJSliderTextPainter(
+                      maxValue: widget.maxValue!,
+                      minValue: widget.minValue!,
+                      divisions: widget.divisions,
+                      unitText: widget.unitText,
+                      nodeValueStyle: widget.nodeValueStyle ?? const TextStyle(
+                          fontWeight: FontWeight.w400,
+                          fontSize: 12,
+                          color: Color(0xFF878E9A)
+                      ),
+                    ),
+                  ),
+                )
+            ) : Container(),
           ],
         ),
       ),
@@ -306,7 +340,7 @@ class ZFJNodeSlisderState extends State<ZFJNodeSlisder> {
         _showBubble = true;
       });
     } else {
-      // 0.5秒以后再移除气泡
+      // 0.25秒以后再移除气泡
       Future.delayed(const Duration(milliseconds: 250), () {
         setState(() {
           _showBubble = false;
@@ -356,20 +390,17 @@ class ZFJNodeSlisderState extends State<ZFJNodeSlisder> {
 }
 
 /// slider通道
-class SliderPainter extends CustomPainter {
+class ZFJSliderPainter extends CustomPainter {
   final Color? activeTrackColor;
-
   final double Function(double maxDx) getDx;
   final int divisions;
 
-  SliderPainter(
-      this.getDx, {
-        this.activeTrackColor,
-        this.divisions = 4,
-      }
-      );
+  ZFJSliderPainter({
+    required this.getDx,
+    this.activeTrackColor,
+    this.divisions = 4,
+  });
 
-  /// 初始化画笔
   var lineP = Paint()..strokeCap = StrokeCap.butt;
 
   @override
@@ -395,4 +426,91 @@ class SliderPainter extends CustomPainter {
   bool shouldRepaint(CustomPainter oldDelegate) {
     return false;
   }
+}
+
+/// 节点文字
+class ZFJSliderTextPainter extends CustomPainter {
+
+  // 最大值
+  final int maxValue;
+  // 最小值
+  final int minValue;
+  // 段数
+  final int divisions;
+  // 单位
+  final String unitText;
+  // 节点文字样式
+  final TextStyle nodeValueStyle;
+
+  ZFJSliderTextPainter({
+    required this.maxValue,
+    required this.minValue,
+    required this.divisions,
+    required this.unitText,
+    required this.nodeValueStyle,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    double width = size.width;
+
+    for (int i = 0; i <= divisions; i++) {
+      String textStr = (minValue > 0 && i == 0) ?
+      '${minValue.toStringAsFixed(0)}$unitText' :
+      '${((maxValue) / divisions * i).toStringAsFixed(0)}$unitText';
+
+      TextPainter textPainter = TextPainter();
+      final TextSpan textSpan = TextSpan(
+        text: textStr,
+        style: nodeValueStyle,
+      );
+      textPainter.text = textSpan;
+      textPainter.textDirection =
+      i == divisions ? TextDirection.rtl : TextDirection.ltr;
+      textPainter.textAlign = i == divisions ? TextAlign.end : TextAlign.center;
+      textPainter.layout(maxWidth: 35);
+
+      // 文字位移宽度： 前移本身长度的1/2
+      double space = i == 0 ? 0 : (i == divisions ? -textPainter.width : -(textPainter.width / 2)); //textPainter.width: 文字长度
+
+      textPainter.paint(
+        canvas,
+        Offset(i * (width / divisions) + space, 0),
+      );
+    }
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) {
+    return false;
+  }
+}
+
+/// 气泡向下的箭头
+class ZFJDownArrowPainter extends CustomPainter {
+
+  // 气泡背景颜色
+  final Color bgColor;
+
+  ZFJDownArrowPainter({
+    required this.bgColor
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint();
+    paint.color = bgColor;
+
+    final path = Path();
+    path.moveTo(0, 0);
+    path.lineTo(size.width, 0);
+    path.lineTo(size.width / 2, size.height);
+    path.close();
+
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(ZFJDownArrowPainter oldDelegate) => false;
+
 }
