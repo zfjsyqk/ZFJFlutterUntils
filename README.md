@@ -1,4 +1,4 @@
-# ZFJ自定义分段选择器Slider
+# 【Flutter】ZFJ自定义分段选择器Slider
 
 ## 前言
 在开发一个APP的时候，需要用到一个分段选择器，系统的不满足就自己自定义了一个；
@@ -150,4 +150,4 @@ _slisderStateKey.currentState?.selectedAll();
 
 喜欢的点个小心心吧⭐️
 
-[ZFJFlutterUntils/zfj_node_slisder.dart](https://github.com/zfjsyqk/ZFJFlutterUntils/blob/main/flutter_untils/lib/untils/zfj_node_slisder.dart)
+[ZFJFlutterUntils/zfj_node_slisder.dart](https://github.com/zfjsyqk/ZFJFlutterUntils/blob/main/flutter_untils/lib/untils/zfj_node_slisder.dart)https://github.com/zfjsyqk/ZFJFlutterUntils/blob/main/flutter_untils/lib/untils/zfj_node_slisder.dart)
